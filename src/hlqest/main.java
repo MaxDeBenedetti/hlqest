@@ -18,6 +18,7 @@ public class main {
         hlqest hlq = new hlqest();
         
         double[] data = {2,3,5,7,8};
+        System.out.println(HodgesLehmannClassic.HLEstimator(data));
         System.out.print(hlq.HLEstimator(data));
     }
 }
