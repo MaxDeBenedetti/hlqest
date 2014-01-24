@@ -17,8 +17,8 @@ public class main {
         // TODO code application logic here
         hlqest hlq = new hlqest();
         
-        double[] data = {2,3,5,7,8};
+        double[] data = QuickSort.RDSG.generateDataSet(1000, 5);
         System.out.println(HodgesLehmannClassic.HLEstimator(data));
-        System.out.print(hlq.HLEstimator(data));
+        System.out.println(hlq.HLEstimator(data));
     }
 }

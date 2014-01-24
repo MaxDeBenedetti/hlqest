@@ -34,10 +34,8 @@ public class hlqest {
         left.clear();
         right.clear();
         n = dataSet.length - 1;
-        
-        
-        int k = (int) Math.ceil(dataSet.length*(dataSet.length + 1)/4);
-        int index, row, col;
+
+        int index, row, col, leftIsZero;
         double element, pivot;
         
         //sort the data
@@ -50,8 +48,15 @@ public class hlqest {
             data.add(anArray);
         }
         
+        //int k = partitionSize(data)/2;
+        //int k = (int) Math.ceil(dataSet.length*(dataSet.length + 1)/4);
+        int k = (dataSet.length)/2;
+        
+        int leftSize = 0;
+        leftIsZero =0;//By preventing too many consecutive iterations where the left side has no elements, I should remove any remaining infinite loops
+        
         //Here is the all important partitioning process.
-        while (partitionSize(data) > k){
+        while (partitionSize(data) > k && leftIsZero < 10){
             left.clear();
             right.clear();
             
@@ -59,11 +64,15 @@ public class hlqest {
             index = 0; 
             row = data.get(index)[0];
             col = data.get(index)[2];
+            pivot = pickPivot(data, dataSet);
+            //pivot = pickPivot(dataSet);
+            
+            if(Double.isNaN(pivot))
+                break;
             
             while(isInBounds(index, col)){
                 element = (dataSet[row] + dataSet[col])/2;
-                pivot = pickPivot(dataSet);
-                
+
                 if(element < pivot){
                     int[] addToLeft = {row, data.get(index)[1], col};//adds the elemnts that is smaller than the pivot to the partitioning of elements smaller than the pivot
                     left.add(addToLeft);
@@ -86,7 +95,12 @@ public class hlqest {
             }
         
         
-            int leftSize = partitionSize(left);
+            leftSize = partitionSize(left);
+            if(leftSize == 0){
+                leftIsZero++;
+            }
+            else
+                leftIsZero--;
 
             data.clear();
 
@@ -96,15 +110,19 @@ public class hlqest {
             else{
                 data.addAll(right);
             }
+            
+            
 
         }
         
         if(k%2 == 0){
             return biggest(data, dataSet);
         }
-        else{
+        else if(leftSize > 0){
             return (biggest(left, dataSet)+biggest(right, dataSet))/2;
         }
+        else
+            return biggest(right, dataSet);
     }
     
     
@@ -129,7 +147,35 @@ public class hlqest {
     private double pickPivot(double[] dataSet){
         double range = dataSet[dataSet.length-1]-dataSet[0];
         
-        double pivot = Math.random()*range + dataSet[0];
+        double pivot1 = Math.random()*range + dataSet[0];
+        double pivot2 = Math.random()*range + dataSet[0];
+        double pivot3 = Math.random()*range + dataSet[0];
+        
+        double pivot = QuickSort.Compare3.median(pivot1,pivot2,pivot3);
+        
+        return pivot;
+    }
+    
+    /*
+     * Similar to quick sort, this algorithm requires a the selection of a pivot element for the partitioning process.
+     * This version is a quick version that will select a random double that is within the range of the data set. I may use a better version later.
+     * 
+     * If the range of the elements is 0, then every element is the same and no further partitioning can be done.
+     * This actually means that the program worked, but this will result in an infinite loop.
+     * This method will return NaN if the range is 0.
+     */
+    private double pickPivot(ArrayList<int[]> part, double[] dataSet){
+        double biggest = ( dataSet[part.get(part.size()-1)[0]] + dataSet[part.get(part.size()-1)[2]] )/2;
+        double smallest = ( dataSet[part.get(0)[0]] + dataSet[part.get(0)[1]] )/2;
+        double range = biggest-smallest;
+        
+        //double range = biggest(part, dataSet)-smallest(part, dataSet);
+        
+        double pivot1 = Math.random()*range + smallest ;
+        double pivot2 = Math.random()*range + smallest;
+        double pivot3 = Math.random()*range + smallest;
+        
+        double pivot = (range !=0) ? QuickSort.Compare3.median(pivot1,pivot2,pivot3) : Double.NaN;
         
         return pivot;
     }
@@ -155,6 +201,34 @@ public class hlqest {
         }
         
         return max;
+    }
+    
+    private double smallest(ArrayList<int[]> part, double[] nums){
+        double min = Double.POSITIVE_INFINITY;
+        double num;
+        for(int[] bounds : part){
+            for(int i = bounds[1]; i <= bounds[2]; i++){
+                num = (nums[bounds[0]] + nums[i])/2;
+                 min = (num < min) ? num : min;
+            }
+        }
+        
+        return min;
+    }
+    
+    private double middle(ArrayList<int[]> part, double[] nums){
+        int size = partitionSize(part);
+        double[] median = new double[size];
+        int k = 0;
+        
+        for(int[]bounds: part){
+            for(int i = bounds[1]; i <= bounds[2]; i++){
+                median[k]= (nums[bounds[0]] + nums[i])/2;
+                k++;
+            }
+        }        
+        
+        return fastMedian.find_kth_smallest_double(median, size, size/2);
     }
     
 }
