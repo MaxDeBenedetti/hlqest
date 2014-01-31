@@ -13,12 +13,12 @@ import java.util.Random;
  */
 public class RDSG {
 
-    public static double[] generateDataSet(int size, int seed){
+    public static double[] generateDataSet(int size, int spread, int seed){
         double rands[] = new double[size];
         Random rand = new Random(seed);
         
         for(int i = 0; i < size ; i++){
-            rands[i]=rand.nextDouble()*500;
+            rands[i]=rand.nextDouble()*spread;
         }
         
         

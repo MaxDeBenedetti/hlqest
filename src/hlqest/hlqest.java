@@ -7,6 +7,7 @@ package hlqest;
 import QuickSort.InsertionSort;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -20,6 +21,7 @@ public class hlqest {
      */
     private ArrayList<int[]> data, left, right;
     private int n;//pointer to the last element of the data set
+    private int leftIsZero;
     
     public hlqest(){
         data = new ArrayList();
@@ -35,7 +37,7 @@ public class hlqest {
         right.clear();
         n = dataSet.length - 1;
 
-        int index, row, col, leftIsZero;
+        int index, row, col;
         double element, pivot;
         
         //sort the data
@@ -56,12 +58,17 @@ public class hlqest {
         leftIsZero =0;//By preventing too many consecutive iterations where the left side has no elements, I should remove any remaining infinite loops
         
         //Here is the all important partitioning process.
-        while (partitionSize(data) > k && leftIsZero < 10){
+        while (partitionSize(data) > k){
             left.clear();
             right.clear();
             
             //We start with the top right element
             index = 0; 
+//            
+//            if(data.get(index)[2]-data.get(index)[1] < 2){
+//                index++;
+//            }
+            
             row = data.get(index)[0];
             col = data.get(index)[2];
             pivot = pickPivot(data, dataSet);
@@ -69,6 +76,7 @@ public class hlqest {
             
             if(Double.isNaN(pivot))
                 break;
+            
             
             while(isInBounds(index, col)){
                 element = (dataSet[row] + dataSet[col])/2;
@@ -110,19 +118,20 @@ public class hlqest {
             else{
                 data.addAll(right);
             }
-            
-            
+           
+            if(leftIsZero > 10){
+                n=n;
+            }
 
         }
         
         if(k%2 == 0){
-            return biggest(data, dataSet);
+            return fastBiggest(data, dataSet);
         }
-        else if(leftSize > 0){
-            return (biggest(left, dataSet)+biggest(right, dataSet))/2;
+        else{
+            return (fastBiggest(left, dataSet)+fastBiggest(right, dataSet))/2;
         }
-        else
-            return biggest(right, dataSet);
+
     }
     
     
@@ -169,14 +178,29 @@ public class hlqest {
         double smallest = ( dataSet[part.get(0)[0]] + dataSet[part.get(0)[1]] )/2;
         double range = biggest-smallest;
         
-        //double range = biggest(part, dataSet)-smallest(part, dataSet);
+        Random rand = new Random();
+        int index = rand.nextInt(part.size());
+        int row = part.get(index)[2]-part.get(index)[1];
+        int value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
+        double pivot1 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
         
-        double pivot1 = Math.random()*range + smallest ;
-        double pivot2 = Math.random()*range + smallest;
-        double pivot3 = Math.random()*range + smallest;
+        index = rand.nextInt(part.size());
+        row = part.get(index)[2]-part.get(index)[1];
+        value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
+        double pivot2 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
         
-        double pivot = (range !=0) ? QuickSort.Compare3.median(pivot1,pivot2,pivot3) : Double.NaN;
+        index = rand.nextInt(part.size());
+        row = part.get(index)[2]-part.get(index)[1];
+        value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
+        double pivot3 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
         
+        double pivot = (range >.3) ? (pivot1+pivot2+pivot3)/3 : Double.NaN;
+        
+        if(leftIsZero > 10){
+                pivot = (dataSet[part.get(0)[0]]+dataSet[part.get(0)[2]])/2;
+                leftIsZero = 0;
+        }
+                
         return pivot;
     }
     
@@ -190,6 +214,13 @@ public class hlqest {
         return sum;
     }
     
+    //Assumes that the largest element is the last element allowing for selection in linear time
+    //This assumption seems to hold true once the partitioning process has stopped
+    private double fastBiggest(ArrayList<int[]> part, double[] nums){
+        double biggest = ( nums[part.get(part.size()-1)[0]] + nums[part.get(part.size()-1)[2]] )/2;
+        return biggest;
+    }
+    
     private double biggest(ArrayList<int[]> part, double[] nums){
         double max = Double.NEGATIVE_INFINITY;
         double num;
@@ -199,6 +230,8 @@ public class hlqest {
                 max = (num > max) ? num : max;
             }
         }
+        
+        
         
         return max;
     }
@@ -212,6 +245,11 @@ public class hlqest {
                  min = (num < min) ? num : min;
             }
         }
+        
+        double smallest = ( nums[part.get(0)[0]] + nums[part.get(0)[1]] )/2;
+        
+        if(Math.abs(smallest - min)<.1)
+            System.out.println("small");
         
         return min;
     }
