@@ -17,7 +17,7 @@ public class main {
         // TODO code application logic here
         hlqest hlq = new hlqest();
         
-        double[] data = QuickSort.RDSG.generateDataSet(1000, 500, 7);
+        double[] data = QuickSort.RDSG.generateDataSet(1000, 500, 8);
         System.out.println(HodgesLehmannClassic.HLEstimator(data));
         System.out.println(hlq.HLEstimator(data));
         double sum=0;

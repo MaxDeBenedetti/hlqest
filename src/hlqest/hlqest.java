@@ -208,7 +208,7 @@ public class hlqest {
         
         int sum = 0;
         for(int[] bounds : part){
-            sum += bounds[2]-bounds[1];
+            sum += bounds[2]-bounds[1]+1;
         }
         
         return sum;
@@ -261,6 +261,9 @@ public class hlqest {
         
         for(int[]bounds: part){
             for(int i = bounds[1]; i <= bounds[2]; i++){
+                if( i == 710){
+                    n=n;
+                }
                 median[k]= (nums[bounds[0]] + nums[i])/2;
                 k++;
             }
