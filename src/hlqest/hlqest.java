@@ -38,7 +38,8 @@ public class hlqest {
         n = dataSet.length - 1;
 
         int index, row, col;
-        double element, pivot;
+        double element;
+        double pivot = Double.POSITIVE_INFINITY;
         
         //sort the data
         //I will replace the insertion sort with a quick sort at a later date.
@@ -52,7 +53,7 @@ public class hlqest {
         
         //int k = partitionSize(data)/2;
         //int k = (int) Math.ceil(dataSet.length*(dataSet.length + 1)/4);
-        int k = (dataSet.length)/2;
+        int k = dataSet.length/2;
         
         int leftSize = 0;
         leftIsZero =0;//By preventing too many consecutive iterations where the left side has no elements, I should remove any remaining infinite loops
@@ -71,7 +72,7 @@ public class hlqest {
             
             row = data.get(index)[0];
             col = data.get(index)[2];
-            pivot = pickPivot(data, dataSet);
+            pivot = (Double.isInfinite(pivot))? median(dataSet): pickPivot(data, dataSet);
             //pivot = pickPivot(dataSet);
             
             if(Double.isNaN(pivot))
@@ -108,7 +109,7 @@ public class hlqest {
                 leftIsZero++;
             }
             else
-                leftIsZero--;
+                leftIsZero=0;
 
             data.clear();
 
@@ -180,21 +181,31 @@ public class hlqest {
         
         Random rand = new Random();
         int index = rand.nextInt(part.size());
-        int row = part.get(index)[2]-part.get(index)[1];
-        int value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
-        double pivot1 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
+//        int row = part.get(index)[2]-part.get(index)[1];
+//        int value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
+//        double pivot1 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
+//        
+//        index = rand.nextInt(part.size());
+//        row = part.get(index)[2]-part.get(index)[1];
+//        value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
+//        double pivot2 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
+//        
+//        index = rand.nextInt(part.size());
+//        row = part.get(index)[2]-part.get(index)[1];
+//        value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
+//        double pivot3 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
+//        
+//        double pivot = (range >.3) ? (pivot1+pivot2+pivot3)/3 : Double.NaN;
         
-        index = rand.nextInt(part.size());
-        row = part.get(index)[2]-part.get(index)[1];
-        value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
-        double pivot2 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
-        
-        index = rand.nextInt(part.size());
-        row = part.get(index)[2]-part.get(index)[1];
-        value = (row>0) ? part.get(index)[1]+rand.nextInt(row): part.get(index)[1];
-        double pivot3 = (dataSet[part.get(index)[0]]+dataSet[value])/2;
-        
-        double pivot = (range >.3) ? (pivot1+pivot2+pivot3)/3 : Double.NaN;
+        double pivot;
+        if (range <.3){
+            pivot = Double.NaN;
+        }
+        else{
+            int row = part.get(index)[0];
+            int col = (part.get(index)[2]-part.get(index)[1]+1)/2 + part.get(index)[1];
+            pivot = (dataSet[row]+dataSet[col])/2;
+        }
         
         if(leftIsZero > 10){
                 pivot = (dataSet[part.get(0)[0]]+dataSet[part.get(0)[2]])/2;
@@ -272,4 +283,13 @@ public class hlqest {
         return fastMedian.find_kth_smallest_double(median, size, size/2);
     }
     
+    //finds the median of sorted data
+    private double median(double[] nums){
+        if(nums.length%2 !=0){
+            return nums[nums.length/2 ];
+        }
+        else{
+            return (nums[nums.length/2 ] + nums[nums.length/2 +1])/2;
+        }
+    }
 }
